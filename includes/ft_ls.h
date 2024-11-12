@@ -21,7 +21,9 @@
 # include <time.h>
 # include <sys/types.h>
 # include <errno.h>
+#include <string.h>
 
+// structs
 typedef struct s_flags
 {
 	int	l;
@@ -51,12 +53,13 @@ typedef struct s_paths
 }	t_paths;
 
 /* Parsing functions */
-int		parse_flags(int argc, char **argv, t_flags *flags);
-t_paths	*parse_arguments(int argc, char **argv, int start_index);
+int	parse_flags(int argc, char **argv, t_flags *flags, int *file_indices);
+t_paths *parse_arguments(int argc, char **argv, int *file_indices, int file_count);
 void	free_paths(t_paths *paths);
 t_file	*parse_path(char *path);
 
 /* Execution functions */
+void list_directories(t_paths *paths, t_flags *flags);
 void	list_directory(char *path, t_flags *flags);
 void	sort_files(t_file **files, t_flags *flags);
 void	display_files(t_file *files, t_flags *flags);

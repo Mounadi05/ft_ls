@@ -65,27 +65,33 @@ static int	set_flag(char flag, t_flags *flags)
 	return (1);
 }
 
-int	parse_flags(int argc, char **argv, t_flags *flags)
+int	parse_flags(int argc, char **argv, t_flags *flags, int *file_indices)
 {
 	int	i;
 	int	j;
+	int file_count;
 
 	init_flags(flags);
 	i = 1;
-	while (i < argc && argv[i][0] == '-')
-	{
-		if (argv[i][1] == '\0')
-			return (i);
-		if (argv[i][1] == '-' && argv[i][2] == '\0')
-			return (i + 1);
-		j = 1;
-		while (argv[i][j])
-		{
-			if (!set_flag(argv[i][j], flags))
-				return (-1);
-			j++;
-		}
-		i++;
-	}
-	return (i);
+	file_count = 0;
+	while (i < argc)
+    {
+        if (argv[i][0] == '-' && argv[i][1] != '\0')
+        {
+            if (argv[i][1] == '-' && argv[i][2] == '\0')
+                continue;;
+            j = 1;
+            while (argv[i][j])
+            {
+                if (!set_flag(argv[i][j], flags))
+                    return (-1);
+                j++;
+            }
+        }
+		else
+			file_indices[file_count++] = i;
+        i++;
+    }
+	return (file_count);
+	
 }
