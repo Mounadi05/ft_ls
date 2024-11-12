@@ -6,10 +6,10 @@ void list_directories(t_paths *paths, t_flags *flags)
 
     i = 0;
     while (i < paths->count)
-        list_directory(paths->items[i++], flags);
+        list_directory(paths->items[i++], flags, paths);
 }
 
-void list_directory(char *path, t_flags *flags)
+void list_directory(char *path, t_flags *flags, t_paths *paths)
 {
     DIR *dir;
     struct dirent *entry;
@@ -55,6 +55,10 @@ void list_directory(char *path, t_flags *flags)
     closedir(dir);
 
     // sort_files(&files, flags);
+    if (paths->count > 1)
+    {
+        ft_printf("%s:\n", path);
+    }
     display_files(files, flags);
 
     while (files)

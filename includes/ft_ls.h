@@ -22,6 +22,7 @@
 # include <sys/types.h>
 # include <errno.h>
 #include <string.h>
+#include <sys/ioctl.h>
 
 // structs
 typedef struct s_flags
@@ -60,7 +61,7 @@ t_file	*parse_path(char *path);
 
 /* Execution functions */
 void list_directories(t_paths *paths, t_flags *flags);
-void	list_directory(char *path, t_flags *flags);
+void	list_directory(char *path, t_flags *flags,t_paths *paths);
 void	sort_files(t_file **files, t_flags *flags);
 void	display_files(t_file *files, t_flags *flags);
 
