@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amounadi <mounadi1337@gmail.com>           +#+  +:+       +#+        */
+/*   By: amounadi <amounadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/08 20:52:08 by amounadi          #+#    #+#             */
-/*   Updated: 2021/11/20 17:54:08 by amounadi         ###   ########.fr       */
+/*   Updated: 2024/11/14 23:08:49 by amounadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,7 @@
 
 # include <stdlib.h>
 # include <unistd.h>
-#include <stdarg.h>
-
+# include <stdarg.h>
 
 # define LLONG_MAX 9223372036854775807
 
@@ -69,10 +68,11 @@ void	ft_lstdelone(t_list *lst, void (*del)(void*));
 void	ft_lstclear(t_list **lst, void (*del)(void*));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
-int ft_strcmp(const char *s1, const char *s2);
-int ft_strcasecmp(const char *s1, const char *s2);
-
-
+int		ft_strcmp(const char *s1, const char *s2);
+int		ft_strcasecmp(const char *s1, const char *s2);
+char	*ft_strupper(char *str);
+char	*ft_strlower(char *str);
+void	ft_rvarray(char **arr, int size);
 
 /* ---------------------------- ft_printf ------------------------------ */
 int		ft_printf(const char *str, ...);
@@ -83,7 +83,5 @@ int		ft_putuint(unsigned int nb);
 int		ft_puthexlow(int nbr);	
 int		ft_puthexupper(int nbr);
 int		ft_put_memory(void *addr);
-
-
 
 #endif

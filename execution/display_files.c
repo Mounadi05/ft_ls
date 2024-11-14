@@ -1,110 +1,108 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   display_files.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amounadi <amounadi@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/13 19:30:35 by amounadi          #+#    #+#             */
+/*   Updated: 2024/11/14 23:05:18 by amounadi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/ft_ls.h"
 
-void display_file_info(t_file *file)
+void	display_file_info(t_file *file, t_flags *flags, t_padding *pad)
 {
-    char *time_str;
-    struct passwd *pw;
-    struct group *gr;
+	char			*time_str;
+	struct passwd	*pw;
+	struct group	*gr;
+	char			link_target[1024];
+	ssize_t			link_len;
 
-  
-    // File type and permissions
-    ft_printf((S_ISDIR(file->stats.st_mode)) ? "d" : "-");
-    ft_printf((file->stats.st_mode & S_IRUSR) ? "r" : "-");
-    ft_printf((file->stats.st_mode & S_IWUSR) ? "w" : "-");
-    ft_printf((file->stats.st_mode & S_IXUSR) ? "x" : "-");
-    ft_printf((file->stats.st_mode & S_IRGRP) ? "r" : "-");
-    ft_printf((file->stats.st_mode & S_IWGRP) ? "w" : "-");
-    ft_printf((file->stats.st_mode & S_IXGRP) ? "x" : "-");
-    ft_printf((file->stats.st_mode & S_IROTH) ? "r" : "-");
-    ft_printf((file->stats.st_mode & S_IWOTH) ? "w" : "-");
-    ft_printf((file->stats.st_mode & S_IXOTH) ? "x" : "-");
+	display_file_type_permission(file);
 
-    // Number of hard links
-    ft_printf(" %2ld", file->stats.st_nlink);
+	// Number of hard links with padding
+	size_t	i;
+	int		tmp;
+	size_t	count_len;
 
-    // User and group name
-    pw = getpwuid(file->stats.st_uid);
-    gr = getgrgid(file->stats.st_gid);
-    ft_printf(" %s %s", pw->pw_name, gr->gr_name);
+	i = 0;
+	tmp = file->stats.st_nlink;
+	count_len = 0;
+	while (tmp > 0)
+	{
+		count_len++;
+		tmp /= 10;
+	}
+	ft_printf(" ");
+	while (i++ < pad->link_width - count_len)
+		ft_printf(" ");
+	ft_printf("%d", (int)file->stats.st_nlink);
 
-    // File size
-    ft_printf(" %5lld", (long long)file->stats.st_size);
+	// User and group name with padding
+	pw = getpwuid(file->stats.st_uid);
+	gr = getgrgid(file->stats.st_gid);
+	if (!flags->g)
+	{
+		ft_printf(" %s", pw->pw_name);
+		i = 0;
+		while (i++ < pad->user_width - ft_strlen(pw->pw_name))
+			ft_printf(" ");
+	}
+	ft_printf(" %s", gr->gr_name);
+	i = 0;
+	while (i++ < pad->group_width - ft_strlen(gr->gr_name))
+		ft_printf(" ");
 
-    // Modification time
-    time_str = ctime(&file->stats.st_mtime);
-    time_str[16] = '\0'; // Remove the newline character
-    ft_printf(" %s", time_str + 4);
+	// File size with padding
+	i = 0;
+	tmp = file->stats.st_size;
+	count_len = 0;
+	while (tmp > 0)
+	{
+		count_len++;
+		tmp /= 10;
+	}
+	if (file->stats.st_size == 0)
+		count_len = 1;
+	ft_printf(" ");
+	while (i++ < pad->size_width - count_len)
+		ft_printf(" ");
+	ft_printf("%d", (int)file->stats.st_size);
 
-    ft_printf(" %s\n", file->name);
-    
+	// Modification time
+	time_str = ctime(&file->stats.st_mtime);
+	time_str[16] = '\0';
+	ft_printf(" %s", time_str + 4);
+
+	ft_printf(" %s", file->name);
+
+	if (S_ISLNK(file->stats.st_mode))
+	{
+		link_len = readlink(file->path, link_target, sizeof(link_target) - 1);
+		if (link_len > 0)
+		{
+			link_target[link_len] = '\0';
+			ft_printf(" -> %s", link_target);
+		}
+	}
+	ft_printf("\n");
 }
 
-void display_files(t_file *files, t_flags *flags)
+void	display_long_format(t_file *files, t_flags *flags)
 {
-    sort_files(&files, flags);
-    if (flags->l && 0)
-    {
-        // Display detailed information
-        t_file *current = files;
-        while (current)
-        {
-            display_file_info(current);
-            current = current->next;
-        }
-    }
-    else
-    {
-        // Display files in columns
-        struct winsize w;
-        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-        int term_width = w.ws_col; 
+	t_padding	pad;
+	t_file		*current;
 
-        // Collect file names and calculate total length
-        int file_count = 0;
-        int max_len = 0; 
-        t_file *current = files;
-        while (current)
-        {
-            int len = ft_strlen(current->name);
-            if (len > max_len)
-                max_len = len;
-            file_count++;
-            current = current->next;
-        }
+	calculate_padding(files, &pad);
+	ft_printf("total %d\n", calculate_total_blocks(files) / 2);
 
-        // Calculate number of columns
-        int cols = term_width / (max_len + 2);
-        if (cols == 0)
-            cols = 1;  // Ensure at least 1 column
-        int rows = (file_count + cols - 1) / cols;  // Round up for rows
-
-        // Collect file names
-        current = files;
-        char **file_names = (char **)malloc(file_count * sizeof(char *));
-        int i = 0;
-        while (current)
-        {
-            file_names[i++] = current->name;
-            current = current->next;
-        }
-
-        // Print files in columns
-        for (int row = 0; row < rows; row++)
-        {
-            for (int col = 0; col < cols; col++)
-            {
-                int index = col * rows + row;
-                if (index < file_count)
-                {
-                    ft_putstr(file_names[index]);
-                    int padding = max_len - ft_strlen(file_names[index]) + 2; 
-                    while (padding-- > 0)
-                        ft_putchar(' ');
-                }
-            }
-            ft_putchar('\n');
-        }
-
-        free(file_names);
-    }
+	current = files;
+	while (current)
+	{
+		display_file_info(current, flags, &pad);
+		current = current->next;
+	}
 }
+

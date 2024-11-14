@@ -1,6 +1,6 @@
 NAME = ft_ls
 
-SRC = main.c $(wildcard parsing/*.c) $(wildcard execution/*.c)
+SRC = main.c helper.c $(wildcard parsing/*.c) $(wildcard execution/*.c)
 OBJS = $(SRC:.c=.o)
 
 LIBFT = libft/libft.a

@@ -34,14 +34,8 @@ static int	is_flag(char flag)
 		|| flag == 'G');
 }
 
-static int	set_flag(char flag, t_flags *flags)
+static void	check_flag(char flag, t_flags *flags)
 {
-	if (!is_flag(flag))
-	{
-		ft_printf("ft_ls: illegal option -- %c\n", flag);
-		ft_printf("usage: ft_ls [-lRartAFgd] [file ...]\n");
-		return (0);
-	}
 	if (flag == 'l')
 		flags->l = 1;
 	else if (flag == 'r')
@@ -62,6 +56,17 @@ static int	set_flag(char flag, t_flags *flags)
 		flags->d = 1;
 	else if (flag == 'G')
 		flags->cap_G = 1;
+}
+
+static int	set_flag(char flag, t_flags *flags)
+{
+	if (!is_flag(flag))
+	{
+		ft_printf("ft_ls: illegal option -- %c\n", flag);
+		ft_printf("usage: ft_ls [-lRartAFgd] [file ...]\n");
+		return (0);
+	}
+	check_flag(flag,flags);
 	return (1);
 }
 
@@ -82,16 +87,12 @@ int	parse_flags(int argc, char **argv, t_flags *flags, int *file_indices)
                 continue;;
             j = 1;
             while (argv[i][j])
-            {
-                if (!set_flag(argv[i][j], flags))
+                if (!set_flag(argv[i][j++], flags))
                     return (-1);
-                j++;
-            }
         }
 		else
 			file_indices[file_count++] = i;
         i++;
     }
 	return (file_count);
-	
 }
