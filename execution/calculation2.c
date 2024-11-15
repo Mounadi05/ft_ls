@@ -6,20 +6,20 @@
 /*   By: amounadi <amounadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 22:02:35 by amounadi          #+#    #+#             */
-/*   Updated: 2024/11/14 23:01:34 by amounadi         ###   ########.fr       */
+/*   Updated: 2024/11/15 23:44:53 by amounadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
-int	calculate_total_width(int cols, int file_count, char **file_names)
+int	calculate_total_width(int cols, int file_count, char **f_n)
 {
 	int	*col_widths;
 	int	total_width;
 	int	col;
 
 	col_widths = (int *)ft_calloc(cols, sizeof(int));
-	calculate_column_width(col_widths, file_names, file_count, cols);
+	calculate_column_width(col_widths, f_n, file_count, cols);
 	total_width = -2;
 	col = 0;
 	while (col < cols)
@@ -31,8 +31,7 @@ int	calculate_total_width(int cols, int file_count, char **file_names)
 	return (total_width);
 }
 
-void	calculate_column_width(int *col_widths, char **file_names,
-			int file_count, int cols)
+void	calculate_column_width(int *c_w, char **f_n, int f_c, int cols)
 {
 	int		col;
 	int		row;
@@ -40,7 +39,7 @@ void	calculate_column_width(int *col_widths, char **file_names,
 	int		rows;
 	size_t	max_col_width;
 
-	rows = (file_count + cols - 1) / cols;
+	rows = (f_c + cols - 1) / cols;
 	col = 0;
 	while (col < cols)
 	{
@@ -49,14 +48,14 @@ void	calculate_column_width(int *col_widths, char **file_names,
 		while (row < rows)
 		{
 			index = col * rows + row;
-			if (index < file_count)
+			if (index < f_c)
 			{
-				if (ft_strlen(file_names[index]) > max_col_width)
-					max_col_width = ft_strlen(file_names[index]);
+				if (ft_strlen(f_n[index]) > max_col_width)
+					max_col_width = ft_strlen(f_n[index]);
 			}
 			row++;
 		}
-		col_widths[col] = max_col_width;
+		c_w[col] = max_col_width;
 		col++;
 	}
 }
